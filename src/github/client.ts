@@ -1,5 +1,11 @@
 import { Result } from "better-result";
 import { env } from "@/env.ts";
+import {
+  GitHubApiError,
+  RateLimitError,
+  UserNotFoundError,
+  toGitHubError,
+} from "@/github/errors.ts";
 import type { GitHubRepo, GitHubSearchResult, GitHubUser } from "@/github/types.ts";
 
 function getHeaders(): HeadersInit {
@@ -13,25 +19,28 @@ function getHeaders(): HeadersInit {
 async function githubFetch<T>(url: string): Promise<T> {
   const res = await fetch(url, { headers: getHeaders() });
 
-  if (res.status === 404) throw new Error("User not found");
-  if (res.status === 403) throw new Error("GitHub API rate limit exceeded");
-  if (!res.ok) throw new Error(`GitHub API error: ${res.status}`);
+  if (res.status === 404) throw new UserNotFoundError({ message: "User not found" });
+  if (res.status === 403) throw new RateLimitError({ message: "GitHub API rate limit exceeded" });
+  if (!res.ok) throw new GitHubApiError({ status: res.status, message: `GitHub API error: ${res.status}` });
 
   return res.json() as Promise<T>;
 }
 
 export function fetchUser(username: string) {
-  return Result.tryPromise(() =>
-    githubFetch<GitHubUser>(`https://api.github.com/users/${username}`)
-  );
+  return Result.tryPromise({
+    try: () => githubFetch<GitHubUser>(`https://api.github.com/users/${username}`),
+    catch: toGitHubError,
+  });
 }
 
 export function fetchRepos(username: string) {
-  return Result.tryPromise(() =>
-    githubFetch<GitHubRepo[]>(
-      `https://api.github.com/users/${username}/repos?per_page=100&type=owner`
-    )
-  );
+  return Result.tryPromise({
+    try: () =>
+      githubFetch<GitHubRepo[]>(
+        `https://api.github.com/users/${username}/repos?per_page=100&type=owner`
+      ),
+    catch: toGitHubError,
+  });
 }
 
 export async function searchCount(query: string): Promise<number> {

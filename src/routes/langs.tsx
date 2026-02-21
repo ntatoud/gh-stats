@@ -6,6 +6,7 @@ import { fetchUser } from "@/github/client.ts";
 import { computeTopLanguages } from "@/github/langs.ts";
 import { LangsCard } from "@/cards/langs.tsx";
 import { usernameParam } from "@/routes/schemas.ts";
+import { githubErrorResponse } from "@/routes/errors.ts";
 
 export const langsRoute = new Hono();
 
@@ -19,14 +20,13 @@ langsRoute.get("/langs/:username", zValidator("param", usernameParam), async (c)
   });
 
   if (result.isErr()) {
-    const msg = result.error instanceof Error ? result.error.message : "Unknown error";
-    return c.json({ error: msg }, msg.includes("not found") ? 404 : 500);
+    return githubErrorResponse(c, result.error);
   }
 
   const { user, langs } = result.value;
 
   if (langs.length === 0) {
-    return c.json({ error: "No language data found for this user" }, 404);
+    return c.json({ error: { code: "NO_LANGUAGE_DATA", message: "No language data found for this user" } }, 404);
   }
 
   return new ImageResponse(<LangsCard username={user.login} langs={langs} />, {

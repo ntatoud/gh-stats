@@ -1,10 +1,7 @@
-import { Hono } from "hono";
 import { ImageResponse } from "@takumi-rs/image-response";
-import { StatsCard } from "@/cards/stats.tsx";
-import { LangsCard } from "@/cards/langs.tsx";
+import { StatsCard } from "@/features/stats/card.tsx";
+import { LangsCard } from "@/features/langs/card.tsx";
 import type { ComputedStats, GitHubUser, TopLanguage } from "@/github/types.ts";
-
-export const devRoutes = new Hono();
 
 const MOCK_USER: GitHubUser = {
   login: "octocat",
@@ -34,20 +31,17 @@ const MOCK_LANGS: TopLanguage[] = [
   { name: "CSS", count: 1, percentage: 2, color: "#563d7c" },
 ];
 
-devRoutes.get("/stats", (c) => {
+export function devStatsController() {
   return new ImageResponse(<StatsCard user={MOCK_USER} stats={MOCK_STATS} />, {
     width: 560,
     height: 185,
     format: "png",
   }) as Response;
-});
+}
 
-devRoutes.get("/langs", (c) => {
+export function devLangsController() {
   return new ImageResponse(
     <LangsCard username={MOCK_USER.login} langs={MOCK_LANGS} />,
-    {
-      width: 340,
-      format: "png",
-    }
+    { width: 340, format: "png" }
   ) as Response;
-});
+}

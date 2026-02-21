@@ -17,7 +17,10 @@ function LangRow({ lang }: { lang: TopLanguage }) {
           style={{ width: `${lang.percentage}%`, background: lang.color }}
         />
       </div>
-      <span tw="text-[12px] text-[#7d8590]" style={{ width: 36, textAlign: "right" }}>
+      <span
+        tw="text-[12px] text-[#7d8590]"
+        style={{ width: 36, textAlign: "right" }}
+      >
         {lang.percentage}%
       </span>
     </div>
@@ -38,7 +41,6 @@ export function LangsCard({ username, langs }: LangsCardProps) {
         fontFamily: "Geist",
       }}
     >
-      {/* Background glow */}
       <div
         tw="flex absolute rounded-full"
         style={{
@@ -51,13 +53,11 @@ export function LangsCard({ username, langs }: LangsCardProps) {
         }}
       />
 
-      {/* Header */}
       <div tw="flex items-center justify-between mb-5">
         <span tw="text-base font-bold text-[#e6edf3]">Most Used Languages</span>
         <span tw="text-xs text-[#7d8590]">@{username}</span>
       </div>
 
-      {/* Stacked color bar */}
       <div tw="flex w-full h-2 rounded-full overflow-hidden mb-4">
         {langs.map((lang) => (
           <div
@@ -68,7 +68,6 @@ export function LangsCard({ username, langs }: LangsCardProps) {
         ))}
       </div>
 
-      {/* Language rows */}
       <div tw="flex flex-col gap-2.5 flex-1">
         {langs.map((lang) => (
           <LangRow key={lang.name} lang={lang} />

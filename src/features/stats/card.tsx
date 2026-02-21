@@ -38,7 +38,6 @@ export function StatsCard({ user, stats }: StatsCardProps) {
         fontFamily: "Geist",
       }}
     >
-      {/* Background glow */}
       <div
         tw="flex absolute rounded-full"
         style={{
@@ -51,7 +50,6 @@ export function StatsCard({ user, stats }: StatsCardProps) {
         }}
       />
 
-      {/* Header */}
       <div tw="flex items-center gap-4 mb-6">
         <img
           src={user.avatar_url}
@@ -72,7 +70,6 @@ export function StatsCard({ user, stats }: StatsCardProps) {
         </div>
       </div>
 
-      {/* Divider */}
       <div
         tw="flex w-full mb-5"
         style={{
@@ -81,7 +78,6 @@ export function StatsCard({ user, stats }: StatsCardProps) {
         }}
       />
 
-      {/* Stats row */}
       <div tw="flex flex-1 items-center">
         <StatItem label="Stars" value={stats.totalStars} />
         <Divider />

@@ -1,0 +1,26 @@
+{
+  "name": "gh-stats",
+  "module": "src/index.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "bun run --hot src/index.ts",
+    "start": "bun run src/index.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/react": "^19.2.14"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@hono/zod-validator": "0.7.6",
+    "@t3-oss/env-core": "0.13.10",
+    "@takumi-rs/image-response": "^0.68.17",
+    "better-result": "^2.7.0",
+    "hono": "^4.12.1",
+    "react": "^19.2.4",
+    "zod": "4.3.6"
+  }
+}

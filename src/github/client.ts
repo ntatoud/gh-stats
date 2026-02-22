@@ -43,9 +43,16 @@ export function fetchRepos(username: string) {
   });
 }
 
-export async function searchCount(query: string): Promise<number> {
+export async function searchIssuesCount(query: string): Promise<number> {
   const data = await githubFetch<GitHubSearchResult>(
     `https://api.github.com/search/issues?q=${encodeURIComponent(query)}&per_page=1`
+  );
+  return data.total_count;
+}
+
+export async function searchCommitsCount(query: string): Promise<number> {
+  const data = await githubFetch<GitHubSearchResult>(
+    `https://api.github.com/search/commits?q=${encodeURIComponent(query)}&per_page=1`
   );
   return data.total_count;
 }

@@ -4,9 +4,10 @@ import { Result } from "better-result";
 import { fetchUser } from "@/github/client.ts";
 import { githubErrorResponse } from "@/shared/error-response.ts";
 import { computeStats } from "@/features/stats/service.ts";
-import { StatsCard } from "@/features/stats/card.tsx";
+import { computeRank } from "@/features/rank/service.ts";
+import { RankCard } from "@/features/rank/card.tsx";
 
-export async function statsController(
+export async function rankController(
   c: Context,
   { username }: { username: string }
 ) {
@@ -21,11 +22,15 @@ export async function statsController(
   }
 
   const { user, stats } = result.value;
+  const rank = computeRank(stats, user);
 
-  return new ImageResponse(<StatsCard user={user} stats={stats} />, {
-    width: 560,
-    height: 185,
-    format: "png",
-    headers: { "Cache-Control": "public, max-age=3600, s-maxage=3600" },
-  }) as Response;
+  return new ImageResponse(
+    <RankCard user={user} stats={stats} rank={rank} />,
+    {
+      width: 400,
+      height: 300,
+      format: "png",
+      headers: { "Cache-Control": "public, max-age=3600, s-maxage=3600" },
+    }
+  ) as Response;
 }

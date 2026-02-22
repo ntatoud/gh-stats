@@ -1,26 +1,47 @@
+import { Result } from "better-result";
+import {
+  fetchRepos,
+  searchCommitsCount,
+  searchIssuesCount,
+} from "@/github/client.ts";
 import type { ComputedStats, GitHubUser } from "@/github/types.ts";
 
-export const TIERS = [
-  "E",
-  "E+",
-  "D",
-  "D+",
-  "C",
-  "C+",
-  "B",
-  "B+",
-  "A",
-  "A+",
-  "S",
-  "S+",
-] as const;
+function oneYearAgo(): string {
+  const d = new Date();
+  d.setFullYear(d.getFullYear() - 1);
+  return d.toISOString().split("T")[0];
+}
+
+export function computeStats(username: string) {
+  return Result.gen(async function* () {
+    const repos = yield* Result.await(fetchRepos(username));
+    const since = oneYearAgo();
+
+    const [totalCommits, totalPRs, totalIssues] = await Promise.all([
+      searchCommitsCount(`author:${username} committer-date:>${since}`).catch(() => 0),
+      searchIssuesCount(`author:${username} type:pr is:merged created:>${since}`).catch(() => 0),
+      searchIssuesCount(`author:${username} type:issue created:>${since}`).catch(() => 0),
+    ]);
+
+    const stats: ComputedStats = {
+      totalStars: repos.reduce((acc, r) => acc + r.stargazers_count, 0),
+      totalForks: repos.reduce((acc, r) => acc + r.forks_count, 0),
+      totalCommits,
+      totalPRs,
+      totalIssues,
+    };
+
+    return Result.ok(stats);
+  });
+}
+
+export const TIERS = ["E", "E+", "D", "D+", "C", "C+", "B", "B+", "A", "A+", "S", "S+"] as const;
 
 export type Tier = (typeof TIERS)[number];
 
 export interface RankInfo {
   xp: number; // 0–100
   tier: Tier;
-  tierIndex: number; // 0–11
 }
 
 // Minimum XP required to enter each tier
@@ -47,18 +68,17 @@ export function computeRank(
     100
   );
 
-  let tierIndex = 0;
+  let tier: Tier = TIERS[0];
   for (let i = TIERS.length - 1; i >= 0; i--) {
     if (xp >= (TIER_THRESHOLDS[i] ?? 0)) {
-      tierIndex = i;
+      tier = TIERS[i] as Tier;
       break;
     }
   }
 
   return {
     xp: Math.round(xp * 10) / 10,
-    tier: TIERS[tierIndex] as Tier,
-    tierIndex,
+    tier,
   };
 }
 

@@ -1,4 +1,4 @@
-import { ImageResponse } from "@takumi-rs/image-response";
+import { ImageResponse } from "@takumi-rs/image-response/wasm";
 import { LangsCard } from "../langs/card.tsx";
 import { RankCard } from "../rank/card.tsx";
 import { computeRank } from "../rank/service.ts";
@@ -35,7 +35,7 @@ const MOCK_LANGS: TopLanguage[] = [
 export function devLangsController() {
   return new ImageResponse(
     <LangsCard username={MOCK_USER.login} langs={MOCK_LANGS} />,
-    { width: 340, format: "png" }
+    { module: import("@takumi-rs/wasm/takumi_wasm_bg.wasm"), width: 340, format: "png" }
   ) as Response;
 }
 
@@ -43,6 +43,6 @@ export function devRankController() {
   const rank = computeRank(MOCK_STATS, MOCK_USER);
   return new ImageResponse(
     <RankCard user={MOCK_USER} stats={MOCK_STATS} rank={rank} />,
-    { width: 400, height: 300, format: "png" }
+    { module: import("@takumi-rs/wasm/takumi_wasm_bg.wasm"), width: 400, height: 300, format: "png" }
   ) as Response;
 }

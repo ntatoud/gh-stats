@@ -1,4 +1,4 @@
-import "@takumi-rs/image-response";
+import "@takumi-rs/image-response/wasm";
 import type { ComputedStats, GitHubUser } from "../../github/types.ts";
 import { getTierColor, type RankInfo } from "./service.ts";
 

@@ -1,4 +1,4 @@
-import "@takumi-rs/image-response";
+import "@takumi-rs/image-response/wasm";
 import type { TopLanguage } from "../../github/types.ts";
 
 function LangRow({ lang }: { lang: TopLanguage }) {

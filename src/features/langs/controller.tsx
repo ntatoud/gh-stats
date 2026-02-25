@@ -1,5 +1,5 @@
 import type { Context } from "hono";
-import { ImageResponse } from "@takumi-rs/image-response";
+import { ImageResponse } from "@takumi-rs/image-response/wasm";
 import { Result } from "better-result";
 import { fetchUser } from "../../github/client.ts";
 import { githubErrorResponse } from "../../shared/error-response.ts";
@@ -40,6 +40,7 @@ export async function langsController(
   }
 
   const response = new ImageResponse(<LangsCard username={user.login} langs={langs} />, {
+    module: import("@takumi-rs/wasm/takumi_wasm_bg.wasm"),
     width: 340,
     format: "png",
   }) as Response;

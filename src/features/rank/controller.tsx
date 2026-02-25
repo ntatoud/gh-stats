@@ -1,5 +1,5 @@
 import type { Context } from "hono";
-import { ImageResponse } from "@takumi-rs/image-response";
+import { ImageResponse } from "@takumi-rs/image-response/wasm";
 import { Result } from "better-result";
 import { fetchUser } from "../../github/client.ts";
 import { githubErrorResponse } from "../../shared/error-response.ts";
@@ -34,6 +34,7 @@ export async function rankController(
   const rank = computeRank(stats, user);
 
   const response = new ImageResponse(<RankCard user={user} stats={stats} rank={rank} />, {
+    module: import("@takumi-rs/wasm/takumi_wasm_bg.wasm"),
     width: 400,
     height: 300,
     format: "png",

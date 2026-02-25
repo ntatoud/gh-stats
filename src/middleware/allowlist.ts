@@ -1,5 +1,5 @@
 import type { MiddlewareHandler } from "hono";
-import { env } from "@/env.ts";
+import { env } from "../env.ts";
 
 // Built once at startup from the validated env value
 const allowedUsernames = env.ALLOWED_USERNAMES

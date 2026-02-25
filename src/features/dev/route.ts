@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import {
   devLangsController,
   devRankController,
-} from "@/features/dev/controller.tsx";
+} from "./controller.tsx";
 
 export const devRoute = new Hono();
 

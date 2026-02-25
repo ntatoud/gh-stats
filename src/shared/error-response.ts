@@ -1,6 +1,6 @@
 import { matchError } from "better-result";
 import type { Context } from "hono";
-import type { GitHubError } from "@/github/errors.ts";
+import type { GitHubError } from "../github/errors.ts";
 
 interface ErrorBody {
   code: string;

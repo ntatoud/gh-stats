@@ -1,8 +1,8 @@
 import { ImageResponse } from "@takumi-rs/image-response";
-import { LangsCard } from "@/features/langs/card.tsx";
-import { RankCard } from "@/features/rank/card.tsx";
-import { computeRank } from "@/features/rank/service.ts";
-import type { ComputedStats, GitHubUser, TopLanguage } from "@/github/types.ts";
+import { LangsCard } from "../langs/card.tsx";
+import { RankCard } from "../rank/card.tsx";
+import { computeRank } from "../rank/service.ts";
+import type { ComputedStats, GitHubUser, TopLanguage } from "../../github/types.ts";
 
 const MOCK_USER: GitHubUser = {
   login: "octocat",

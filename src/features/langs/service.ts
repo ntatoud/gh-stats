@@ -1,6 +1,6 @@
 import { Result } from "better-result";
-import { fetchRepos } from "@/github/client.ts";
-import type { TopLanguage } from "@/github/types.ts";
+import { fetchRepos } from "../../github/client.ts";
+import type { TopLanguage } from "../../github/types.ts";
 
 export const LANGUAGE_COLORS: Record<string, string> = {
   TypeScript: "#3178c6",

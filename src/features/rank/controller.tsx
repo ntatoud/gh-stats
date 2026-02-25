@@ -1,11 +1,11 @@
 import type { Context } from "hono";
 import { ImageResponse } from "@takumi-rs/image-response";
 import { Result } from "better-result";
-import { fetchUser } from "@/github/client.ts";
-import { githubErrorResponse } from "@/shared/error-response.ts";
-import { computeStats, computeRank } from "@/features/rank/service.ts";
-import { RankCard } from "@/features/rank/card.tsx";
-import { imageCache } from "@/shared/cache.ts";
+import { fetchUser } from "../../github/client.ts";
+import { githubErrorResponse } from "../../shared/error-response.ts";
+import { computeStats, computeRank } from "./service.ts";
+import { RankCard } from "./card.tsx";
+import { imageCache } from "../../shared/cache.ts";
 
 const CACHE_HEADERS = { "Cache-Control": "public, max-age=86400, s-maxage=86400" };
 

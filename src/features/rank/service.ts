@@ -3,8 +3,8 @@ import {
   fetchRepos,
   searchCommitsCount,
   searchIssuesCount,
-} from "@/github/client.ts";
-import type { ComputedStats, GitHubUser } from "@/github/types.ts";
+} from "../../github/client.ts";
+import type { ComputedStats, GitHubUser } from "../../github/types.ts";
 
 function oneYearAgo() {
   const d = new Date();

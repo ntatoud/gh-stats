@@ -3,17 +3,17 @@ import { ImageResponse } from "@takumi-rs/image-response";
 import { Result } from "better-result";
 import { fetchUser } from "@/github/client.ts";
 import { githubErrorResponse } from "@/shared/error-response.ts";
-import { computeTopLanguages } from "@/features/langs/service.ts";
-import { LangsCard } from "@/features/langs/card.tsx";
+import { computeStats, computeRank } from "@/features/rank/service.ts";
+import { RankCard } from "@/features/rank/card.tsx";
 import { imageCache } from "@/shared/cache.ts";
 
 const CACHE_HEADERS = { "Cache-Control": "public, max-age=86400, s-maxage=86400" };
 
-export async function langsController(
+export async function rankController(
   c: Context,
   { username }: { username: string },
 ) {
-  const cached = imageCache.get(`langs:${username}`);
+  const cached = imageCache.get(`rank:${username}`);
   if (cached) {
     return new Response(cached, {
       headers: { "Content-Type": "image/png", ...CACHE_HEADERS },
@@ -22,30 +22,25 @@ export async function langsController(
 
   const result = await Result.gen(async function* () {
     const user = yield* Result.await(fetchUser(username));
-    const langs = yield* Result.await(computeTopLanguages(username));
-    return Result.ok({ user, langs });
+    const stats = yield* Result.await(computeStats(username));
+    return Result.ok({ user, stats });
   });
 
   if (result.isErr()) {
     return githubErrorResponse(c, result.error);
   }
 
-  const { user, langs } = result.value;
+  const { user, stats } = result.value;
+  const rank = computeRank(stats, user);
 
-  if (langs.length === 0) {
-    return c.json(
-      { error: { code: "NO_LANGUAGE_DATA", message: "No language data found for this user" } },
-      404,
-    );
-  }
-
-  const response = new ImageResponse(<LangsCard username={user.login} langs={langs} />, {
-    width: 340,
+  const response = new ImageResponse(<RankCard user={user} stats={stats} rank={rank} />, {
+    width: 400,
+    height: 300,
     format: "png",
   }) as Response;
 
   const bytes = await response.arrayBuffer();
-  imageCache.set(`langs:${username}`, bytes);
+  imageCache.set(`rank:${username}`, bytes);
 
   return new Response(bytes, {
     headers: { "Content-Type": "image/png", ...CACHE_HEADERS },

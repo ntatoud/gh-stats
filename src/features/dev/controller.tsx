@@ -1,6 +1,7 @@
 import { ImageResponse } from "@takumi-rs/image-response";
-import { StatsCard } from "@/features/stats/card.tsx";
 import { LangsCard } from "@/features/langs/card.tsx";
+import { RankCard } from "@/features/rank/card.tsx";
+import { computeRank } from "@/features/rank/service.ts";
 import type { ComputedStats, GitHubUser, TopLanguage } from "@/github/types.ts";
 
 const MOCK_USER: GitHubUser = {
@@ -31,17 +32,17 @@ const MOCK_LANGS: TopLanguage[] = [
   { name: "CSS", count: 1, percentage: 2, color: "#563d7c" },
 ];
 
-export function devStatsController() {
-  return new ImageResponse(<StatsCard user={MOCK_USER} stats={MOCK_STATS} />, {
-    width: 560,
-    height: 185,
-    format: "png",
-  }) as Response;
-}
-
 export function devLangsController() {
   return new ImageResponse(
     <LangsCard username={MOCK_USER.login} langs={MOCK_LANGS} />,
     { width: 340, format: "png" }
+  ) as Response;
+}
+
+export function devRankController() {
+  const rank = computeRank(MOCK_STATS, MOCK_USER);
+  return new ImageResponse(
+    <RankCard user={MOCK_USER} stats={MOCK_STATS} rank={rank} />,
+    { width: 400, height: 300, format: "png" }
   ) as Response;
 }

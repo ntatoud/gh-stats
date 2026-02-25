@@ -5,11 +5,21 @@ import { fetchUser } from "@/github/client.ts";
 import { githubErrorResponse } from "@/shared/error-response.ts";
 import { computeStats, computeRank } from "@/features/rank/service.ts";
 import { RankCard } from "@/features/rank/card.tsx";
+import { imageCache } from "@/shared/cache.ts";
+
+const CACHE_HEADERS = { "Cache-Control": "public, max-age=86400, s-maxage=86400" };
 
 export async function rankController(
   c: Context,
   { username }: { username: string },
 ) {
+  const cached = imageCache.get(`rank:${username}`);
+  if (cached) {
+    return new Response(cached, {
+      headers: { "Content-Type": "image/png", ...CACHE_HEADERS },
+    });
+  }
+
   const result = await Result.gen(async function* () {
     const user = yield* Result.await(fetchUser(username));
     const stats = yield* Result.await(computeStats(username));
@@ -23,10 +33,16 @@ export async function rankController(
   const { user, stats } = result.value;
   const rank = computeRank(stats, user);
 
-  return new ImageResponse(<RankCard user={user} stats={stats} rank={rank} />, {
+  const response = new ImageResponse(<RankCard user={user} stats={stats} rank={rank} />, {
     width: 400,
     height: 300,
     format: "png",
-    headers: { "Cache-Control": "public, max-age=3600, s-maxage=3600" },
   }) as Response;
+
+  const bytes = await response.arrayBuffer();
+  imageCache.set(`rank:${username}`, bytes);
+
+  return new Response(bytes, {
+    headers: { "Content-Type": "image/png", ...CACHE_HEADERS },
+  });
 }

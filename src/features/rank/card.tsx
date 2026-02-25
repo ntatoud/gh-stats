@@ -39,20 +39,12 @@ export function RankCard({ user, stats, rank }: RankCardProps) {
 
   return (
     <div
-      tw="flex flex-col w-full h-full px-8 py-6 relative overflow-hidden"
+      tw="flex flex-col size-full px-8 py-6 relative overflow-hidden"
       style={{
         background: "linear-gradient(135deg, #0d1117 0%, #13181f 100%)",
         fontFamily: "Geist",
       }}
     >
-      <div
-        tw="flex w-full mb-5"
-        style={{
-          height: 1,
-          background: "linear-gradient(90deg, #21262d, #30363d, #21262d)",
-        }}
-      />
-      <span tw="text-[13px] text-[#7d8590]">@{user.login}</span>
       <div tw="flex flex-1 items-center gap-8">
         <div
           tw="flex relative"
@@ -84,18 +76,14 @@ export function RankCard({ user, stats, rank }: RankCardProps) {
               transform={`rotate(-90 ${CENTER} ${CENTER})`}
             />
           </svg>
-          <div
-            tw="flex absolute flex-col items-center justify-center inset-0"
-          >
+          <div tw="flex absolute flex-col items-center justify-center inset-0">
             <span
               tw="font-bold leading-none"
               style={{ color: tierColor, fontSize: 38 }}
             >
               {tier}
             </span>
-            <span tw="mt-1" style={{ color: "#7d8590", fontSize: 11 }}>
-              {xp.toFixed(1)} / 100
-            </span>
+            <span tw="text-[13px] text-[#7d8590]">@{user.login}</span>
           </div>
         </div>
 

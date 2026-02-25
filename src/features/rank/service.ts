@@ -6,7 +6,7 @@ import {
 } from "@/github/client.ts";
 import type { ComputedStats, GitHubUser } from "@/github/types.ts";
 
-function oneYearAgo(): string {
+function oneYearAgo() {
   const d = new Date();
   d.setFullYear(d.getFullYear() - 1);
   return d.toISOString().split("T")[0];
@@ -18,9 +18,15 @@ export function computeStats(username: string) {
     const since = oneYearAgo();
 
     const [totalCommits, totalPRs, totalIssues] = await Promise.all([
-      searchCommitsCount(`author:${username} committer-date:>${since}`).catch(() => 0),
-      searchIssuesCount(`author:${username} type:pr is:merged created:>${since}`).catch(() => 0),
-      searchIssuesCount(`author:${username} type:issue created:>${since}`).catch(() => 0),
+      searchCommitsCount(`author:${username} committer-date:>${since}`).catch(
+        () => 0,
+      ),
+      searchIssuesCount(
+        `author:${username} type:pr is:merged created:>${since}`,
+      ).catch(() => 0),
+      searchIssuesCount(
+        `author:${username} type:issue created:>${since}`,
+      ).catch(() => 0),
     ]);
 
     const stats: ComputedStats = {
@@ -35,7 +41,20 @@ export function computeStats(username: string) {
   });
 }
 
-export const TIERS = ["E", "E+", "D", "D+", "C", "C+", "B", "B+", "A", "A+", "S", "S+"] as const;
+export const TIERS = [
+  "E",
+  "E+",
+  "D",
+  "D+",
+  "C",
+  "C+",
+  "B",
+  "B+",
+  "A",
+  "A+",
+  "S",
+  "S+",
+] as const;
 
 export type Tier = (typeof TIERS)[number];
 
@@ -52,10 +71,7 @@ function logScale(value: number, max: number): number {
   return Math.log1p(value) / Math.log1p(max);
 }
 
-export function computeRank(
-  stats: ComputedStats,
-  user: GitHubUser
-): RankInfo {
+export function computeRank(stats: ComputedStats, user: GitHubUser): RankInfo {
   // Caps tuned for yearly activity (commits/PRs/issues) vs all-time (stars/followers)
   const starsScore = logScale(stats.totalStars, 10000) * 30;
   const commitsScore = logScale(stats.totalCommits, 1500) * 25;
@@ -65,7 +81,7 @@ export function computeRank(
 
   const xp = Math.min(
     starsScore + commitsScore + prsScore + issuesScore + followersScore,
-    100
+    100,
   );
 
   let tier: Tier = TIERS[0];

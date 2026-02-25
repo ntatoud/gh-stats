@@ -1,12 +1,12 @@
 import { Result } from "better-result";
-import { env } from "../env.js";
+import { env } from "../env.ts";
 import {
   GitHubApiError,
   RateLimitError,
   UserNotFoundError,
   toGitHubError,
-} from "./errors.js";
-import type { GitHubRepo, GitHubSearchResult, GitHubUser } from "./types.js";
+} from "./errors.ts";
+import type { GitHubRepo, GitHubSearchResult, GitHubUser } from "./types.ts";
 
 function getHeaders(): Record<string, string> {
   return {

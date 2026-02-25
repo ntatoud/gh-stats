@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
-import { usernameParam } from "../../shared/schemas.js";
-import { rankController } from "./controller.js";
+import { usernameParam } from "../../shared/schemas.ts";
+import { rankController } from "./controller.tsx";
 
 export const rankRoute = new Hono();
 

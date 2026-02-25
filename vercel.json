@@ -1,7 +1,4 @@
 {
-  "bunVersion": "1.x",
-  "buildCommand": "bun run build",
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/api" }
-  ]
+  "installCommand": "npm install",
+  "buildCommand": "bun run build.ts"
 }

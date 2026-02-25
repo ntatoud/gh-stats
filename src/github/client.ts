@@ -8,7 +8,7 @@ import {
 } from "@/github/errors.ts";
 import type { GitHubRepo, GitHubSearchResult, GitHubUser } from "@/github/types.ts";
 
-function getHeaders(): HeadersInit {
+function getHeaders(): Record<string, string> {
   return {
     Accept: "application/vnd.github+json",
     "X-GitHub-Api-Version": "2022-11-28",

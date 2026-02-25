@@ -12,7 +12,7 @@ const CACHE_HEADERS = { "Cache-Control": "public, max-age=86400, s-maxage=86400"
 export async function langsController(
   c: Context,
   { username }: { username: string },
-) {
+): Promise<Response> {
   const cached = imageCache.get(`langs:${username}`);
   if (cached) {
     return new Response(cached, {
@@ -27,7 +27,7 @@ export async function langsController(
   });
 
   if (result.isErr()) {
-    return githubErrorResponse(c, result.error);
+    return githubErrorResponse(c, result.error) as Response;
   }
 
   const { user, langs } = result.value;

@@ -31,7 +31,7 @@ app.onError((err, c) => {
   return c.json({ error: "Internal server error" }, 500);
 });
 
-const { port } = env;
+const port = env.PORT;
 console.log(`🚀 gh-stats running on http://localhost:${port}`);
 
 export default {

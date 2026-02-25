@@ -1,5 +1,5 @@
 import "@takumi-rs/image-response";
-import type { TopLanguage } from "../../github/types.ts";
+import type { TopLanguage } from "../../github/types.js";
 
 function LangRow({ lang }: { lang: TopLanguage }) {
   return (

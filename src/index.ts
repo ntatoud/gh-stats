@@ -1,8 +1,8 @@
 import { Hono } from "hono";
 import { logger } from "hono/logger";
 import { cors } from "hono/cors";
-import { env } from "./env.ts";
-import { routes } from "./routes.ts";
+import { env } from "./env.js";
+import { routes } from "./routes.js";
 
 const app = new Hono();
 

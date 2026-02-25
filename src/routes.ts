@@ -1,9 +1,9 @@
 import { Hono } from "hono";
-import { langsRoute } from "./features/langs/route.ts";
-import { rankRoute } from "./features/rank/route.ts";
-import { devRoute } from "./features/dev/route.ts";
-import { allowlist } from "./middleware/allowlist.ts";
-import { env } from "./env.ts";
+import { langsRoute } from "./features/langs/route.js";
+import { rankRoute } from "./features/rank/route.js";
+import { devRoute } from "./features/dev/route.js";
+import { allowlist } from "./middleware/allowlist.js";
+import { env } from "./env.js";
 
 export const routes = new Hono();
 

@@ -1,18 +1,14 @@
-import type { Context } from "hono";
 import { ImageResponse } from "@takumi-rs/image-response/wasm";
 import { Result } from "better-result";
-import { fetchUser } from "../../github/client.ts";
-import { githubErrorResponse } from "../../shared/error-response.ts";
-import { computeTopLanguages } from "./service.ts";
-import { LangsCard } from "./card.tsx";
-import { imageCache } from "../../shared/cache.ts";
+import { fetchUser } from "../../github/client";
+import { githubErrorResponse } from "../../shared/error-response";
+import { computeTopLanguages } from "./service";
+import { LangsCard } from "./card";
+import { imageCache } from "../../shared/cache";
 
 const CACHE_HEADERS = { "Cache-Control": "public, max-age=86400, s-maxage=86400" };
 
-export async function langsController(
-  c: Context,
-  { username }: { username: string },
-): Promise<Response> {
+export async function langsController(username: string): Promise<Response> {
   const cached = imageCache.get(`langs:${username}`);
   if (cached) {
     return new Response(cached, {
@@ -27,15 +23,15 @@ export async function langsController(
   });
 
   if (result.isErr()) {
-    return githubErrorResponse(c, result.error) as Response;
+    return githubErrorResponse(result.error);
   }
 
   const { user, langs } = result.value;
 
   if (langs.length === 0) {
-    return c.json(
+    return Response.json(
       { error: { code: "NO_LANGUAGE_DATA", message: "No language data found for this user" } },
-      404,
+      { status: 404 }
     );
   }
 

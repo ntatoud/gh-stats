@@ -1,6 +1,6 @@
 import "@takumi-rs/image-response/wasm";
-import type { ComputedStats, GitHubUser } from "../../github/types.ts";
-import { getTierColor, type RankInfo } from "./service.ts";
+import type { ComputedStats, GitHubUser } from "../../github/types";
+import { getTierColor, type RankInfo } from "./service";
 
 function formatValue(n: number) {
   return n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n);

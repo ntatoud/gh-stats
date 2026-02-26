@@ -1,20 +1,13 @@
 import { matchError } from "better-result";
-import type { Context } from "hono";
-import type { GitHubError } from "../github/errors.ts";
+import type { GitHubError } from "../github/errors";
 
-interface ErrorBody {
-  code: string;
-  message: string;
-}
-
-function body(code: string, message: string): { error: ErrorBody } {
-  return { error: { code, message } };
-}
-
-export function githubErrorResponse(c: Context, error: GitHubError) {
+export function githubErrorResponse(error: GitHubError): Response {
   return matchError(error, {
-    UserNotFoundError: (e) => c.json(body("USER_NOT_FOUND", e.message), 404),
-    RateLimitError: (e) => c.json(body("RATE_LIMIT_EXCEEDED", e.message), 429),
-    GitHubApiError: (e) => c.json(body("GITHUB_API_ERROR", e.message), 502),
+    UserNotFoundError: (e) =>
+      Response.json({ error: { code: "USER_NOT_FOUND", message: e.message } }, { status: 404 }),
+    RateLimitError: (e) =>
+      Response.json({ error: { code: "RATE_LIMIT_EXCEEDED", message: e.message } }, { status: 429 }),
+    GitHubApiError: (e) =>
+      Response.json({ error: { code: "GITHUB_API_ERROR", message: e.message } }, { status: 502 }),
   });
 }

@@ -1,66 +1,96 @@
 import { $ } from "bun";
-import { readFileSync, writeFileSync, unlinkSync } from "node:fs";
-import { join, basename } from "node:path";
+import { readFileSync, writeFileSync, readdirSync, mkdirSync, rmSync } from "node:fs";
+import { join } from "node:path";
 
 const OUTPUT = ".vercel/output";
 const FUNC_DIR = `${OUTPUT}/functions/index.func`;
 
-// Clean previous output
-await $`rm -rf ${OUTPUT}`;
-await $`mkdir -p ${FUNC_DIR}`;
+// Step 1: Run vite build (generates dist/server/server.js + dist/client/)
+await $`bun x vite build`;
 
-// Bundle the Vercel entry point for Node.js
+// Step 2: Set up output directory
+rmSync(OUTPUT, { recursive: true, force: true });
+mkdirSync(FUNC_DIR, { recursive: true });
+
+// Step 3: Write a thin Node.js adapter that wraps the TanStack Start fetch handler.
+// Vercel's launcherType:"Nodejs" sends IncomingMessage/ServerResponse, not Web API Request/Response.
+const ADAPTER = join(FUNC_DIR, "_adapter.mjs");
+await Bun.write(
+  ADAPTER,
+  `import server from "../../../../dist/server/server.js";
+export default async function handler(req, res) {
+  const host = req.headers.host ?? "localhost";
+  const url = new URL(req.url ?? "/", "https://" + host);
+  const headers = new Headers(req.headers);
+  const method = req.method ?? "GET";
+  const hasBody = method !== "GET" && method !== "HEAD";
+  const request = new Request(url, {
+    method,
+    headers,
+    body: hasBody ? req : null,
+    duplex: "half",
+  });
+  const response = await server.fetch(request);
+  res.statusCode = response.status;
+  response.headers.forEach((value, key) => res.setHeader(key, value));
+  const buffer = await response.arrayBuffer();
+  res.end(Buffer.from(buffer));
+}
+`
+);
+
+// Step 4: Bundle the adapter (+ dist/server/server.js + all its dynamic asset imports) with Bun
 const result = await Bun.build({
-  entrypoints: ["src/vercel.ts"],
+  entrypoints: [ADAPTER],
   outdir: FUNC_DIR,
   target: "node",
   naming: "index.mjs",
+  // Include dynamic imports so the router/start assets are bundled inline
+  splitting: false,
 });
 
 if (!result.success) {
-  console.error("Build failed:", result.logs);
+  console.error("Bundle failed:");
+  for (const log of result.logs) console.error(log);
   process.exit(1);
 }
 
-// Post-process: inline WASM as a data URL so Node.js fetch() can load it.
-// Bun emits .wasm as a separate file and the bundle references it as a
-// relative string (e.g. "./takumi_wasm_bg-abc123.wasm"). Node.js fetch()
-// rejects relative URLs, but fetch("data:application/wasm;base64,...") works.
-const wasmOutputs = result.outputs.filter((o) => o.path.endsWith(".wasm"));
-for (const wasmOutput of wasmOutputs) {
-  const wasmBytes = readFileSync(wasmOutput.path);
-  const dataUrl = `data:application/wasm;base64,${wasmBytes.toString("base64")}`;
+// Clean up the temp adapter source
+rmSync(ADAPTER);
 
-  const bundlePath = join(FUNC_DIR, "index.mjs");
+// Step 5: Inline any emitted WASM files as base64 data URLs.
+// Node.js fetch() rejects relative/file: URLs, but data: URLs work fine.
+const bundlePath = join(FUNC_DIR, "index.mjs");
+const wasmFiles = readdirSync(FUNC_DIR).filter((f) => f.endsWith(".wasm"));
+if (wasmFiles.length > 0) {
   let bundle = readFileSync(bundlePath, "utf-8");
-
-  const wasmRef = JSON.stringify(`./${basename(wasmOutput.path)}`);
-  bundle = bundle.replaceAll(wasmRef, JSON.stringify(dataUrl));
-
+  for (const wasmFile of wasmFiles) {
+    const bytes = readFileSync(join(FUNC_DIR, wasmFile));
+    const dataUrl = `data:application/wasm;base64,${bytes.toString("base64")}`;
+    bundle = bundle.replaceAll(`"./${wasmFile}"`, JSON.stringify(dataUrl));
+    rmSync(join(FUNC_DIR, wasmFile));
+    console.log(`[wasm] Inlined ${wasmFile} (${(bytes.length / 1024 / 1024).toFixed(1)} MB)`);
+  }
   writeFileSync(bundlePath, bundle);
-  unlinkSync(wasmOutput.path);
-
-  console.log(`Inlined ${basename(wasmOutput.path)} (${(wasmBytes.length / 1024 / 1024).toFixed(1)}MB) as data URL`);
 }
 
-// Write Vercel output config
+// Step 6: Write Vercel output config
 await Bun.write(
   `${OUTPUT}/config.json`,
-  JSON.stringify({
-    version: 3,
-    routes: [{ src: "/(.*)", dest: "/" }],
-  })
+  JSON.stringify({ version: 3, routes: [{ src: "/(.*)", dest: "/" }] }, null, 2)
 );
-
-// Write function config (Node.js runtime)
 await Bun.write(
   `${FUNC_DIR}/.vc-config.json`,
-  JSON.stringify({
-    runtime: "nodejs22.x",
-    handler: "index.mjs",
-    launcherType: "Nodejs",
-    supportsResponseStreaming: true,
-  })
+  JSON.stringify(
+    {
+      runtime: "nodejs22.x",
+      handler: "index.mjs",
+      launcherType: "Nodejs",
+      supportsResponseStreaming: true,
+    },
+    null,
+    2
+  )
 );
 
 console.log("Build complete → .vercel/output/");

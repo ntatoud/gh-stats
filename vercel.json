@@ -1,5 +1,5 @@
 {
   "framework": null,
-  "installCommand": "npm install",
-  "buildCommand": "bun run build.ts"
+  "installCommand": "bun install",
+  "buildCommand": "bun run build"
 }

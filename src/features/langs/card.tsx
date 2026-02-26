@@ -1,5 +1,5 @@
 import "@takumi-rs/image-response/wasm";
-import type { TopLanguage } from "../../github/types.ts";
+import type { TopLanguage } from "../../github/types";
 
 function LangRow({ lang }: { lang: TopLanguage }) {
   return (

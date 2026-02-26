@@ -1,18 +1,14 @@
-import type { Context } from "hono";
 import { ImageResponse } from "@takumi-rs/image-response/wasm";
 import { Result } from "better-result";
-import { fetchUser } from "../../github/client.ts";
-import { githubErrorResponse } from "../../shared/error-response.ts";
-import { computeStats, computeRank } from "./service.ts";
-import { RankCard } from "./card.tsx";
-import { imageCache } from "../../shared/cache.ts";
+import { fetchUser } from "../../github/client";
+import { githubErrorResponse } from "../../shared/error-response";
+import { computeStats, computeRank } from "./service";
+import { RankCard } from "./card";
+import { imageCache } from "../../shared/cache";
 
 const CACHE_HEADERS = { "Cache-Control": "public, max-age=86400, s-maxage=86400" };
 
-export async function rankController(
-  c: Context,
-  { username }: { username: string },
-): Promise<Response> {
+export async function rankController(username: string): Promise<Response> {
   const cached = imageCache.get(`rank:${username}`);
   if (cached) {
     return new Response(cached, {
@@ -27,7 +23,7 @@ export async function rankController(
   });
 
   if (result.isErr()) {
-    return githubErrorResponse(c, result.error) as Response;
+    return githubErrorResponse(result.error);
   }
 
   const { user, stats } = result.value;

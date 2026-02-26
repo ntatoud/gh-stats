@@ -1,27 +1,30 @@
 {
   "name": "gh-stats",
-  "module": "src/index.ts",
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "bun run --hot src/index.ts",
-    "start": "bun run src/index.ts",
-    "build": "bun run build.ts"
+    "dev": "vite dev",
+    "build": "bun run build.ts",
+    "start": "node dist/server/server.js"
   },
   "devDependencies": {
     "@types/bun": "latest",
-    "@types/react": "^19.2.14"
+    "@types/react": "^19.2.14",
+    "@vitejs/plugin-react": "5.1.4",
+    "nitropack": "2.13.1",
+    "vite": "7.3.1"
   },
   "peerDependencies": {
     "typescript": "^5"
   },
   "dependencies": {
-    "@hono/zod-validator": "0.7.6",
     "@t3-oss/env-core": "0.13.10",
     "@takumi-rs/image-response": "^0.68.17",
+    "@tanstack/react-router": "1.163.2",
+    "@tanstack/react-start": "1.163.2",
     "better-result": "^2.7.0",
-    "hono": "^4.12.1",
     "react": "^19.2.4",
+    "react-dom": "19.2.4",
     "zod": "4.3.6"
   }
 }

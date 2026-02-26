@@ -1,8 +1,8 @@
 import { ImageResponse } from "@takumi-rs/image-response/wasm";
-import { LangsCard } from "../langs/card.tsx";
-import { RankCard } from "../rank/card.tsx";
-import { computeRank } from "../rank/service.ts";
-import type { ComputedStats, GitHubUser, TopLanguage } from "../../github/types.ts";
+import { LangsCard } from "../langs/card";
+import { RankCard } from "../rank/card";
+import { computeRank } from "../rank/service";
+import type { ComputedStats, GitHubUser, TopLanguage } from "../../github/types";
 
 const MOCK_USER: GitHubUser = {
   login: "octocat",
@@ -32,14 +32,14 @@ const MOCK_LANGS: TopLanguage[] = [
   { name: "CSS", count: 1, percentage: 2, color: "#563d7c" },
 ];
 
-export function devLangsController() {
+export function devLangsController(): Response {
   return new ImageResponse(
     <LangsCard username={MOCK_USER.login} langs={MOCK_LANGS} />,
     { module: import("@takumi-rs/wasm/takumi_wasm_bg.wasm"), width: 340, format: "png" }
   ) as Response;
 }
 
-export function devRankController() {
+export function devRankController(): Response {
   const rank = computeRank(MOCK_STATS, MOCK_USER);
   return new ImageResponse(
     <RankCard user={MOCK_USER} stats={MOCK_STATS} rank={rank} />,

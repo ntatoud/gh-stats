@@ -1,4 +1,4 @@
-import { ImageResponse } from "@takumi-rs/image-response/wasm";
+import { ImageResponse } from "@takumi-rs/image-response";
 import { Result } from "better-result";
 import { fetchUser } from "../../github/client";
 import { githubErrorResponse } from "../../shared/error-response";
@@ -36,7 +36,6 @@ export async function langsController(username: string): Promise<Response> {
   }
 
   const response = new ImageResponse(<LangsCard username={user.login} langs={langs} />, {
-    module: import("@takumi-rs/wasm/takumi_wasm_bg.wasm"),
     width: 340,
     format: "png",
   }) as Response;

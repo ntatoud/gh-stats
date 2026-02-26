@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "vite dev",
-    "build": "bun run build.ts",
+    "build": "node --experimental-strip-types build.ts",
     "start": "node dist/server/server.js"
   },
   "devDependencies": {

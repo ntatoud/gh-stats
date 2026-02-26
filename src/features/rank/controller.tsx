@@ -1,4 +1,4 @@
-import { ImageResponse } from "@takumi-rs/image-response/wasm";
+import { ImageResponse } from "@takumi-rs/image-response";
 import { Result } from "better-result";
 import { fetchUser } from "../../github/client";
 import { githubErrorResponse } from "../../shared/error-response";
@@ -30,7 +30,6 @@ export async function rankController(username: string): Promise<Response> {
   const rank = computeRank(stats, user);
 
   const response = new ImageResponse(<RankCard user={user} stats={stats} rank={rank} />, {
-    module: import("@takumi-rs/wasm/takumi_wasm_bg.wasm"),
     width: 400,
     height: 300,
     format: "png",
